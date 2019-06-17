@@ -37,19 +37,26 @@ public class Factory {
 
 }
 
-class Ball extends GOval {
+class Ball extends GImage {
     static private final double DEFAULT_BALL_RADIUS = 12;
     static private final double DEFAULT_VELOCITY_Y = 3.0;
     static private final double DEFAULT_VELOCITY_X_MIN = 1.0;
     static private final double DEFAULT_VELOCITY_X_MAX = 3.0;
+    static private final String ballPNG = "PNG/Ball.png";
     static private final Color DEFAULT_COLOR = Color.BLACK;
+    private final double collisionOffset = 5;
 
     private double[] _velocity; //per frame
 
     Ball(){
+        super(ballPNG);
+        setSize(DEFAULT_BALL_RADIUS, DEFAULT_BALL_RADIUS);
+                /*
         super(DEFAULT_BALL_RADIUS, DEFAULT_BALL_RADIUS);
         setFilled(true);
         setFillColor(DEFAULT_COLOR);
+        */
+
         _velocity = new double[2];
     }
 
@@ -71,30 +78,24 @@ class Ball extends GOval {
         _velocity[1] = velocity;
     }
 
-    public void setPolarVelocity(double velocity, double degrees){
-        double radians = Math.toRadians(degrees);
-        double newVelocityX = velocity * Math.cos(radians);
-        double newVelocityY = -velocity * Math.sin(radians);
-        setVelocityX(Math.min(DEFAULT_VELOCITY_X_MAX, newVelocityX));
-        setVelocityX(Math.max(DEFAULT_VELOCITY_X_MIN, newVelocityX));
-        setVelocityY(newVelocityY);
-
-    }
 
     public void moveBall(){
         move(_velocity[0], _velocity[1]);
     }
 
     public GObject detectCollision (Graphics g){
-        GObject upperLeft = g.getElementAt(getX(), getY()) ;
-        GObject lowerLeft = g.getElementAt(getX(), getBottomY());
-        GObject upperRight = g.getElementAt(getRightX(), getY());
-        GObject lowerRight = g.getElementAt(getRightX(), getBottomY());
-        if (upperLeft != null) return upperLeft;
-        if (lowerLeft != null) return lowerLeft;
-        if (upperRight != null) return upperRight;
-        if (lowerRight != null) return lowerRight;
-        return null;
+        GObject collider = null;
+        GObject upperLeft = g.getElementAt(getX() - collisionOffset, getY() + collisionOffset) ;
+        GObject lowerLeft = g.getElementAt(getX() - collisionOffset, getBottomY() - collisionOffset);
+        GObject upperRight = g.getElementAt(getRightX() + collisionOffset, getY() + collisionOffset);
+        GObject lowerRight = g.getElementAt(getRightX() + collisionOffset, getBottomY() - collisionOffset);
+        if (upperLeft != null) collider =  upperLeft;
+        else if (lowerLeft != null) collider =  lowerLeft;
+        else if (upperRight != null) collider =  upperRight;
+        else if (lowerRight != null) collider =  lowerRight;
+
+        if (collider == null || collider == this) return null;
+        else return collider;
 
     }
 
@@ -191,6 +192,25 @@ class ColorBrick extends Brick {
     private COLORS _color;
 }
 
+
+//TODO: Power up Bricks
+/*
+class PowerBrick extends Brick {
+    PowerBrick(){
+    }
+    public void onCollision() {
+
+
+    }
+}
+*/
+
+
+class PowerEffect {
+    private double speedX;
+    private double speedY;
+    private double score;
+}
 class Paddle extends GRect{
     private static double DEFAULT_PADDLE_WIDTH = 80;
     private static double DEFAULT_PADDLE_HEIGHT = 12;
