@@ -6,7 +6,7 @@ import java.awt.event.MouseEvent;
 public class Graphics extends GraphicsProgram{
     private int CANVAS_WIDTH = 640;
     private int CANVAS_HEIGHT = 720;
-    private int FRAME_LEN = 30;
+    private int FRAME_LEN = 40;
     private Manager management;
 
     Graphics(){
@@ -32,10 +32,21 @@ public class Graphics extends GraphicsProgram{
     }
 
     public void run(){
-        while (true){
+        while (!management.hasWon()){
             pause(FRAME_LEN);
             management.moveFrame();
+            if (management.passedPaddle())
+                management.lifeStrip();
+            if (management.isDead()){
+                management.gameOverSequence();
+                return;
+            }
         }
+
+
+        management.victorySequence();
+
+
     }
 
 }
