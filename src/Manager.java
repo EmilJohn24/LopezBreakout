@@ -1,6 +1,67 @@
+import acm.graphics.GLabel;
 import acm.graphics.GObject;
+import acm.util.RandomGenerator;
 
 import java.awt.*;
+import java.util.Random;
+
+class Score extends GLabel {
+    private int score;
+    private final String label = "Score: ";
+    Score(){
+        super("" , 500, 50);
+        Font font = new Font("Times New Roman", Font.BOLD, 500);
+        score = 0;
+        update();
+    }
+
+    public String stringify(){
+        return String.valueOf(score);
+    }
+    public void add(){
+        score++;
+    }
+
+    public void update(){
+        setText(label + stringify());
+    }
+
+    public int getScore(){
+        return score;
+    }
+}
+
+class Lives extends GLabel {
+    private int _lives = 3;
+    private final String label = "Lives: ";
+
+    Lives(int lives){
+        super("", 50, 50);
+        _lives = lives;
+        update();
+    }
+
+    public void removeLife(){
+        _lives--;
+    }
+
+    public String stringify(){
+        return String.valueOf(_lives);
+    }
+
+    public void update(){
+        setText(label + stringify());
+    }
+
+    public boolean isDead(){
+        return _lives == 0;
+    }
+
+    public int getLife(){
+        return _lives;
+    }
+}
+
 
 public class Manager {
     private Graphics _graphics;
@@ -8,16 +69,21 @@ public class Manager {
     private int NBRICKS_PER_ROW = 10;
     private int NBRICKS_PER_COL = 10;
     private double PROB_PLAIN_BRICK = 1;
-    private double FRAME_RATE = 60;
+    private RandomGenerator velocityGenerator = RandomGenerator.getInstance();
     private Brick[][] _bricks;
     private Ball _ball;
     private Paddle _paddle;
+    private Score _score;
+    private Lives _lives;
     private double BRICK_GAP = 4;
     Manager(){
         _graphics = new Graphics();
         _graphics.linkManager(this);
         _factory = new Factory();
         _bricks = new Brick[NBRICKS_PER_ROW][NBRICKS_PER_COL];
+        _paddle = new Paddle(_graphics);
+        _score = new Score();
+        _lives = new Lives(3);
     }
 
     private Brick generateSingleBrick(){
@@ -42,6 +108,7 @@ public class Manager {
     private boolean isPaddle(GObject g){
         return g == _paddle;
     }
+
 
 
     private boolean wallCollisionManager(){
@@ -71,6 +138,8 @@ public class Manager {
             _ball.bounceUp();
             if (collidedBrick.isDestroyed()){
                 _graphics.remove(collidedBrick);
+                _score.add();
+                _score.update();
             }
         }
     }
@@ -99,21 +168,32 @@ public class Manager {
 
     private void generateBall(){
         _ball = _factory.createPlayerBall();
-        _ball.putBallIn(0, _graphics.getCanvasHeight() / 2);
-        _ball.setVelocityX(3);
-        _ball.setVelocityY(2);
+        _ball.putBallIn(0, 80);
+        _ball.setVelocityX(velocityGenerator.nextDouble(1,10));
+        _ball.setVelocityY(velocityGenerator.nextDouble(1, 10));
         _graphics.add(_ball);
     }
+
 
     private void generatePaddle(){
         _paddle = _factory.createPlayerPaddle(_graphics);
         _graphics.add(_paddle);
     }
 
+    private void addScore(){
+        _graphics.add(_score);
+    }
+
+    private void addLives(){
+        _graphics.add(_lives);
+    }
+
     public void start(String[] args){
         generateBricks();
         generateBall();
         generatePaddle();
+        addScore();
+        addLives();
         _graphics.addMouseListeners();
         _graphics.start(args);
 
@@ -123,6 +203,33 @@ public class Manager {
         _ball.moveBall();
         collisionManager();
     }
+
+    public void victorySequence(){
+        return;
+    }
+
+    public void gameOverSequence(){
+        return;
+    }
+    public boolean lifeStrip(){
+        _lives.removeLife();
+        _ball.reset();
+        return _lives.isDead();
+
+    }
+
+    public boolean hasWon(){
+        return _score.getScore() == NBRICKS_PER_ROW * NBRICKS_PER_COL;
+    }
+
+    public boolean passedPaddle(){
+        return _ball.getY() >= _graphics.getCanvasHeight();
+    }
+
+    public boolean isDead(){
+        return _lives.isDead();
+    }
+
 
 
 }
