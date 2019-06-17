@@ -10,7 +10,8 @@ public class Graphics extends GraphicsProgram{
     private Manager management;
 
     Graphics(){
-        resize(CANVAS_WIDTH, CANVAS_HEIGHT);
+        setCanvasSize(CANVAS_WIDTH, CANVAS_HEIGHT);
+        setSize(CANVAS_WIDTH, CANVAS_HEIGHT);
         pause(1000);
     }
 
