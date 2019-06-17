@@ -58,6 +58,11 @@ class Ball extends GOval {
         setY(y);
     }
 
+    public void reset(){
+        setX(50);
+        setY(50);
+    }
+
     public void setVelocityX(double velocity){
         _velocity[0] = velocity;
     }
@@ -189,13 +194,13 @@ class ColorBrick extends Brick {
 class Paddle extends GRect{
     private static double DEFAULT_PADDLE_WIDTH = 80;
     private static double DEFAULT_PADDLE_HEIGHT = 12;
-    private static double DEFAULT_PADDLE_Y_OFFSET = 30; //from the bottom
+    private static double DEFAULT_PADDLE_Y_OFFSET = 300;//from the bottom
 
 
     Paddle(Graphics g){
         super(DEFAULT_PADDLE_WIDTH, DEFAULT_PADDLE_HEIGHT);
         double bottomY = g.getSize().height - DEFAULT_PADDLE_Y_OFFSET;
-        setBottomY(bottomY);
+        setY(bottomY);
     }
 
 
