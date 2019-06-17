@@ -1,15 +1,17 @@
 import acm.graphics.GLabel;
 import acm.graphics.GObject;
+import acm.util.MediaTools;
 import acm.util.RandomGenerator;
 
+import java.applet.AudioClip;
 import java.awt.*;
-import java.util.Random;
+
 
 class Score extends GLabel {
     private int score;
     private final String label = "Score: ";
-    Score(){
-        super("" , 500, 50);
+    Score(Graphics g){
+        super("" , g.getCanvasWidth(), g.getCanvasHeight() + 30);
         Font font = new Font("Times New Roman", Font.BOLD, 500);
         score = 0;
         update();
@@ -35,8 +37,8 @@ class Lives extends GLabel {
     private int _lives = 3;
     private final String label = "Lives: ";
 
-    Lives(int lives){
-        super("", 50, 50);
+    Lives(int lives, Graphics g){
+        super("", g.getCanvasWidth(), g.getCanvasHeight());
         _lives = lives;
         update();
     }
@@ -70,6 +72,8 @@ public class Manager {
     private int NBRICKS_PER_COL = 10;
     private double PROB_PLAIN_BRICK = 1;
     private RandomGenerator velocityGenerator = RandomGenerator.getInstance();
+    private AudioClip _bounce;
+    private String audioDir = "AUDIO/";
     private Brick[][] _bricks;
     private Ball _ball;
     private Paddle _paddle;
@@ -82,8 +86,20 @@ public class Manager {
         _factory = new Factory();
         _bricks = new Brick[NBRICKS_PER_ROW][NBRICKS_PER_COL];
         _paddle = new Paddle(_graphics);
-        _score = new Score();
-        _lives = new Lives(3);
+        _score = new Score(_graphics);
+        _lives = new Lives(3, _graphics);
+        loadBounceAudio("bounce.wav");
+
+    }
+
+    public void loadBounceAudio(String filename){
+        String location = audioDir + filename;
+        _bounce =  MediaTools.loadAudioClip(location);
+    }
+
+    //TODO: Complete Audio Player
+    public void playBounceSound(){
+        _bounce.play();
     }
 
     private Brick generateSingleBrick(){
@@ -128,6 +144,7 @@ public class Manager {
         GObject collider = _ball.detectCollision(_graphics);
         if (collider == null) return;
 
+        playBounceSound();
         if (isPaddle(collider)){
             _ball.bounceUp();
         }
@@ -168,13 +185,16 @@ public class Manager {
 
     private void generateBall(){
         _ball = _factory.createPlayerBall();
-        _ball.putBallIn(0, 80);
+        _ball.putBallIn(    100,150);
         _ball.setVelocityX(velocityGenerator.nextDouble(1,10));
         _ball.setVelocityY(velocityGenerator.nextDouble(1, 10));
         _graphics.add(_ball);
     }
 
 
+    private void playBounceAudio(){
+
+    }
     private void generatePaddle(){
         _paddle = _factory.createPlayerPaddle(_graphics);
         _graphics.add(_paddle);
