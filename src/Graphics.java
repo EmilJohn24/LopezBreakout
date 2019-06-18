@@ -6,12 +6,11 @@ import java.awt.event.MouseEvent;
 public class Graphics extends GraphicsProgram{
     private int CANVAS_WIDTH = 640;
     private int CANVAS_HEIGHT = 720;
-    private int FRAME_LEN = 40;
+    private int FRAME_LEN = 15;
     private Manager management;
 
     Graphics(){
-        setCanvasSize(CANVAS_WIDTH, CANVAS_HEIGHT);
-        setSize(CANVAS_WIDTH, CANVAS_HEIGHT);
+        setSize(CANVAS_HEIGHT, CANVAS_WIDTH);
         pause(1000);
     }
 
