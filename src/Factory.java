@@ -50,7 +50,7 @@ class Ball extends GImage {
 
     Ball(){
         super(ballPNG);
-        setSize(DEFAULT_BALL_RADIUS, DEFAULT_BALL_RADIUS);
+        setSize(DEFAULT_BALL_RADIUS * 2, DEFAULT_BALL_RADIUS * 2);
                 /*
         super(DEFAULT_BALL_RADIUS, DEFAULT_BALL_RADIUS);
         setFilled(true);
@@ -65,9 +65,9 @@ class Ball extends GImage {
         setY(y);
     }
 
-    public void reset(){
-        setX(50);
-        setY(50);
+    public void reset(Graphics g){
+        setX(g.getCenterX());
+        setY(g.getCenterY());
     }
 
     public void setVelocityX(double velocity){
@@ -115,7 +115,7 @@ class Ball extends GImage {
 }
 
 abstract class Brick extends GImage implements Solid{
-    private static double BRICK_WIDTH = 40;
+    private static double BRICK_WIDTH = 60;
     private static double BRICK_HEIGHT = 12;
     public static String fileExt = ".png";
     Brick(String img, double x, double y){
@@ -196,6 +196,7 @@ class ColorBrick extends Brick {
 //TODO: Power up Bricks
 /*
 class PowerBrick extends Brick {
+
     PowerBrick(){
     }
     public void onCollision() {
@@ -203,8 +204,8 @@ class PowerBrick extends Brick {
 
     }
 }
-*/
 
+*/
 
 class PowerEffect {
     private double speedX;
