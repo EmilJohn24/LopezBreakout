@@ -3,6 +3,7 @@ import acm.graphics.GObject;
 import acm.util.MediaTools;
 import acm.util.RandomGenerator;
 
+import javax.sound.sampled.LineUnavailableException;
 import java.applet.AudioClip;
 import java.awt.*;
 
@@ -11,8 +12,9 @@ class Score extends GLabel {
     private int score;
     private final String label = "Score: ";
     Score(Graphics g){
-        super("" , g.getCanvasWidth(), g.getCanvasHeight() + 30);
-        Font font = new Font("Times New Roman", Font.BOLD, 500);
+        super("", g.getRightX() - 70, g.getY() + 30);
+        Font font = new Font("Times New Roman", Font.BOLD, 20);
+        setFont(font);
         score = 0;
         update();
     }
@@ -38,13 +40,16 @@ class Lives extends GLabel {
     private final String label = "Lives: ";
 
     Lives(int lives, Graphics g){
-        super("", g.getCanvasWidth(), g.getCanvasHeight());
+        super("", g.getRightX() - 70, g.getY() + 60);
+        Font font = new Font("Times New Roman", Font.BOLD, 20);
+        setFont(font);
         _lives = lives;
         update();
     }
 
     public void removeLife(){
         _lives--;
+        update();
     }
 
     public String stringify(){
@@ -98,7 +103,12 @@ public class Manager {
     }
 
     public void playBounceSound(){
-        _bounce.play();
+        try {
+            _bounce.play();
+        }
+        catch(Exception e){
+            return;
+        }
     }
 
     private Brick generateSingleBrick(){
@@ -152,10 +162,11 @@ public class Manager {
             Brick collidedBrick = (Brick) collider;
             collidedBrick.onCollision();
             _ball.bounceUp();
+            _score.add();
+            _score.update();
             if (collidedBrick.isDestroyed()){
                 _graphics.remove(collidedBrick);
-                _score.add();
-                _score.update();
+
             }
         }
     }
@@ -171,7 +182,7 @@ public class Manager {
         for (int col = 0; col < NBRICKS_PER_COL; col++){
             for (int row = 0; row < NBRICKS_PER_ROW; row++){
                 newBrick = generateSingleBrick();
-                xTrack = col * Brick.getBrickWidth();
+                xTrack = col * (Brick.getBrickWidth() + BRICK_GAP);
                 yTrack = row * (Brick.getBrickHeight() + BRICK_GAP);
                 newBrick.setX(xTrack);
                 newBrick.setY(yTrack);
@@ -224,25 +235,33 @@ public class Manager {
     }
 
     public void victorySequence(){
+        GLabel text = new GLabel("YOU WIN", _graphics.getCenterX() - 100, _graphics.getCenterY());
+        Font font = new Font("times-new-roman", Font.BOLD, 50);
+        text.setFont(font);
+        _graphics.add(text);
         return;
     }
 
     public void gameOverSequence(){
+        GLabel text = new GLabel("GAME OVER!", _graphics.getCenterX() - 100, _graphics.getCenterY());
+        Font font = new Font("times-new-roman", Font.BOLD, 50);
+        text.setFont(font);
+        _graphics.add(text);
         return;
     }
     public boolean lifeStrip(){
         _lives.removeLife();
-        _ball.reset();
+        _ball.reset(_graphics);
         return _lives.isDead();
 
     }
 
     public boolean hasWon(){
-        return _score.getScore() == NBRICKS_PER_ROW * NBRICKS_PER_COL;
+        return _score.getScore() == NBRICKS_PER_ROW * NBRICKS_PER_COL * 2;
     }
 
     public boolean passedPaddle(){
-        return _ball.getY() >= _graphics.getCanvasHeight();
+        return _ball.getY() >= _paddle.getBottomY() + 30;
     }
 
     public boolean isDead(){
